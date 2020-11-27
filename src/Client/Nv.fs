@@ -8,7 +8,7 @@ open D3
 
 type Array<'T> = System.Collections.Generic.IList<'T>
 
-let [<Import("nv","module")>] nv: Nv.Nvd3Static = jsNative
+let [<Import("nv","nvd3")>] nv: Nv.Nvd3Static = jsNative
 
 module Nv =
 

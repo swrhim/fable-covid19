@@ -22,7 +22,7 @@
         "react": "^16.10.2",
         "react-dom": "^16.10.2",
         "remotedev": "^0.2.9",
-        "resolve-url-loader": "^3.1.0",
+        "resolve-url-loader": "^3.1.2",
         "sass": "^1.26.10",
         "sass-loader": "^9.0.3",
         "selfsigned": "^1.10.8",
@@ -31,5 +31,9 @@
         "webpack": "^4.41.2",
         "webpack-cli": "^3.3.9",
         "webpack-dev-server": "^3.8.2"
+    },
+    "dependencies": {
+        "d3": "^3.5.17",
+        "nvd3": "^1.8.6"
     }
 }

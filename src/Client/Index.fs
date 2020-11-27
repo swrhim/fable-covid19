@@ -3,6 +3,7 @@ module Index
 open D3
 open Elmish
 open Fable.Remoting.Client
+open Nv.Nv
 open Shared
 open System
 
@@ -123,8 +124,9 @@ let view (model : Model) (dispatch : Msg -> unit) =
                     ]
                 ]
             | {Report = Some report} ->
-                let chart = nv.models.lineChart ()
-                str "SOMETHING"
+                //let chart = nv.charts
+                let chart = nv.model
+                str "test"
 
             (*
             | { Report = Some report } ->

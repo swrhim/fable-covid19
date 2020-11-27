@@ -8,21 +8,21 @@ open Fable.Core.JS
 type Array<'T> = System.Collections.Generic.IList<'T>
 type Symbol = obj
 
-let [<Import("*","module")>] d3: D3.IExports = jsNative
+let [<Import("*","d3")>] d3: D3.IExports = jsNative
 
 module D3 =
-    let [<Import("selection","module/d3")>] selection: Selection.IExports = jsNative
-    let [<Import("transition","module/d3")>] transition: Transition.IExports = jsNative
-    let [<Import("timer","module/d3")>] timer: Timer.IExports = jsNative
-    let [<Import("random","module/d3")>] random: Random.IExports = jsNative
-    let [<Import("ns","module/d3")>] ns: Ns.IExports = jsNative
-    let [<Import("scale","module/d3")>] scale: Scale.IExports = jsNative
-    let [<Import("time","module/d3")>] time: Time.IExports = jsNative
-    let [<Import("behavior","module/d3")>] behavior: Behavior.IExports = jsNative
-    let [<Import("geo","module/d3")>] geo: Geo.IExports = jsNative
-    let [<Import("svg","module/d3")>] svg: Svg.IExports = jsNative
-    let [<Import("layout","module/d3")>] layout: Layout.IExports = jsNative
-    let [<Import("geom","module/d3")>] geom: Geom.IExports = jsNative
+    let [<Import("selection","d3")>] selection: Selection.IExports = jsNative
+    let [<Import("transition","d3")>] transition: Transition.IExports = jsNative
+    let [<Import("timer","d3")>] timer: Timer.IExports = jsNative
+    let [<Import("random","d3")>] random: Random.IExports = jsNative
+    let [<Import("ns","d3")>] ns: Ns.IExports = jsNative
+    let [<Import("scale","d3")>] scale: Scale.IExports = jsNative
+    let [<Import("time","d3")>] time: Time.IExports = jsNative
+    let [<Import("behavior","d3")>] behavior: Behavior.IExports = jsNative
+    let [<Import("geo","d3")>] geo: Geo.IExports = jsNative
+    let [<Import("svg","d3")>] svg: Svg.IExports = jsNative
+    let [<Import("layout","d3")>] layout: Layout.IExports = jsNative
+    let [<Import("geom","d3")>] geom: Geom.IExports = jsNative
 
     type [<AllowNullLiteral>] IExports =
         abstract version: string
@@ -1091,8 +1091,8 @@ module D3 =
             abstract copy: unit -> Ordinal<'Domain, 'Range>
 
     module Time =
-        let [<Import("format","module/d3/time")>] format: Format.IExports = jsNative
-        let [<Import("scale","module/d3/time")>] scale: Scale.IExports = jsNative
+        let [<Import("format","d3/time")>] format: Format.IExports = jsNative
+        let [<Import("scale","d3/time")>] scale: Scale.IExports = jsNative
 
         type [<AllowNullLiteral>] IExports =
             abstract second: Interval
@@ -1146,7 +1146,7 @@ module D3 =
             abstract utc: IntervalUtc with get, set
 
         module Format =
-            let [<Import("utc","module/d3/time/format")>] utc: Utc.IExports = jsNative
+            let [<Import("utc","d3/time/format")>] utc: Utc.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract multi: formats: Array<string * (DateTime -> U2<bool, float>)> -> Format
@@ -1246,17 +1246,17 @@ module D3 =
             abstract y: float with get, set
 
     module Geo =
-        let [<Import("azimuthalEqualArea","module/d3/geo")>] azimuthalEqualArea: AzimuthalEqualArea.IExports = jsNative
-        let [<Import("azimuthalEquidistant","module/d3/geo")>] azimuthalEquidistant: AzimuthalEquidistant.IExports = jsNative
-        let [<Import("conicConformal","module/d3/geo")>] conicConformal: ConicConformal.IExports = jsNative
-        let [<Import("conicEqualArea","module/d3/geo")>] conicEqualArea: ConicEqualArea.IExports = jsNative
-        let [<Import("conicEquidistant","module/d3/geo")>] conicEquidistant: ConicEquidistant.IExports = jsNative
-        let [<Import("equirectangular","module/d3/geo")>] equirectangular: Equirectangular.IExports = jsNative
-        let [<Import("gnomonic","module/d3/geo")>] gnomonic: Gnomonic.IExports = jsNative
-        let [<Import("mercator","module/d3/geo")>] mercator: Mercator.IExports = jsNative
-        let [<Import("orthographic","module/d3/geo")>] orthographic: Orthographic.IExports = jsNative
-        let [<Import("stereographic","module/d3/geo")>] stereographic: Stereographic.IExports = jsNative
-        let [<Import("transverseMercator","module/d3/geo")>] transverseMercator: TransverseMercator.IExports = jsNative
+        let [<Import("azimuthalEqualArea","d3/geo")>] azimuthalEqualArea: AzimuthalEqualArea.IExports = jsNative
+        let [<Import("azimuthalEquidistant","d3/geo")>] azimuthalEquidistant: AzimuthalEquidistant.IExports = jsNative
+        let [<Import("conicConformal","d3/geo")>] conicConformal: ConicConformal.IExports = jsNative
+        let [<Import("conicEqualArea","d3/geo")>] conicEqualArea: ConicEqualArea.IExports = jsNative
+        let [<Import("conicEquidistant","d3/geo")>] conicEquidistant: ConicEquidistant.IExports = jsNative
+        let [<Import("equirectangular","d3/geo")>] equirectangular: Equirectangular.IExports = jsNative
+        let [<Import("gnomonic","d3/geo")>] gnomonic: Gnomonic.IExports = jsNative
+        let [<Import("mercator","d3/geo")>] mercator: Mercator.IExports = jsNative
+        let [<Import("orthographic","d3/geo")>] orthographic: Orthographic.IExports = jsNative
+        let [<Import("stereographic","d3/geo")>] stereographic: Stereographic.IExports = jsNative
+        let [<Import("transverseMercator","d3/geo")>] transverseMercator: TransverseMercator.IExports = jsNative
 
         type [<AllowNullLiteral>] IExports =
             abstract path: unit -> Path
@@ -1362,7 +1362,7 @@ module D3 =
             abstract extent: extent: float * float * float * float -> ClipExtent
 
         module AzimuthalEqualArea =
-            let [<Import("raw","module/d3/geo/azimuthalEqualArea")>] raw: Raw.IExports = jsNative
+            let [<Import("raw","d3/geo/azimuthalEqualArea")>] raw: Raw.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract raw: lambda: float * phi: float -> float * float
@@ -1373,7 +1373,7 @@ module D3 =
                     abstract invert: x: float * y: float -> float * float
 
         module AzimuthalEquidistant =
-            let [<Import("raw","module/d3/geo/azimuthalEquidistant")>] raw: Raw.IExports = jsNative
+            let [<Import("raw","d3/geo/azimuthalEquidistant")>] raw: Raw.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract raw: lambda: float * phi: float -> float * float
@@ -1399,7 +1399,7 @@ module D3 =
                 abstract raw: phi0: float * phi1: float -> RawInvertibleProjection
 
         module Equirectangular =
-            let [<Import("raw","module/d3/geo/equirectangular")>] raw: Raw.IExports = jsNative
+            let [<Import("raw","d3/geo/equirectangular")>] raw: Raw.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract raw: lambda: float * phi: float -> float * float
@@ -1410,7 +1410,7 @@ module D3 =
                     abstract invert: x: float * y: float -> float * float
 
         module Gnomonic =
-            let [<Import("raw","module/d3/geo/gnomonic")>] raw: Raw.IExports = jsNative
+            let [<Import("raw","d3/geo/gnomonic")>] raw: Raw.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract raw: lambda: float * phi: float -> float * float
@@ -1421,7 +1421,7 @@ module D3 =
                     abstract invert: x: float * y: float -> float * float
 
         module Mercator =
-            let [<Import("raw","module/d3/geo/mercator")>] raw: Raw.IExports = jsNative
+            let [<Import("raw","d3/geo/mercator")>] raw: Raw.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract raw: lambda: float * phi: float -> float * float
@@ -1432,7 +1432,7 @@ module D3 =
                     abstract invert: x: float * y: float -> float * float
 
         module Orthographic =
-            let [<Import("raw","module/d3/geo/orthographic")>] raw: Raw.IExports = jsNative
+            let [<Import("raw","d3/geo/orthographic")>] raw: Raw.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract raw: lambda: float * phi: float -> float * float
@@ -1443,7 +1443,7 @@ module D3 =
                     abstract invert: x: float * y: float -> float * float
 
         module Stereographic =
-            let [<Import("raw","module/d3/geo/stereographic")>] raw: Raw.IExports = jsNative
+            let [<Import("raw","d3/geo/stereographic")>] raw: Raw.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract raw: lambda: float * phi: float -> float * float
@@ -1454,7 +1454,7 @@ module D3 =
                     abstract invert: x: float * y: float -> float * float
 
         module TransverseMercator =
-            let [<Import("raw","module/d3/geo/transverseMercator")>] raw: Raw.IExports = jsNative
+            let [<Import("raw","d3/geo/transverseMercator")>] raw: Raw.IExports = jsNative
 
             type [<AllowNullLiteral>] IExports =
                 abstract raw: lambda: float * phi: float -> float * float
@@ -1513,9 +1513,9 @@ module D3 =
             abstract invert: x: float * y: float -> float * float
 
     module Svg =
-        let [<Import("line","module/d3/svg")>] line: Line.IExports = jsNative
-        let [<Import("area","module/d3/svg")>] area: Area.IExports = jsNative
-        let [<Import("diagonal","module/d3/svg")>] diagonal: Diagonal.IExports = jsNative
+        let [<Import("line","d3/svg")>] line: Line.IExports = jsNative
+        let [<Import("area","d3/svg")>] area: Area.IExports = jsNative
+        let [<Import("diagonal","d3/svg")>] diagonal: Diagonal.IExports = jsNative
 
         type [<AllowNullLiteral>] IExports =
             abstract line: unit -> Line<float * float>
