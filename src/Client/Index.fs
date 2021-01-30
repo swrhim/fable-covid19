@@ -1,17 +1,25 @@
 module Index
 
-open D3
-open Elmish
-open Fable.Remoting.Client
-open Nv.Nv
-open Shared
 open System
+open Elmish
+open Fable.Core
+open Fable.FontAwesome
+open Fable.Remoting.Client
+open Shared
+open Fable.MomentJs
+open Fable.React
+open Fable.React.Props
+open Fable.Recharts
+open Fable.Recharts.Props
+open Fulma
 
 type ServerState = Idle | Loading | ServerError of string
-
+let DropDownItems = [ "US" ; "NJ" ; "NY" ]
 type Report =
     {
-        USData : USData
+        USData : USData array
+        StateData : string
+        SelectedItem : string
     }
 
 type Model =
@@ -25,7 +33,12 @@ type Model =
 type Msg =
     | GetCurrentUSCovid
     | GotCurrentUSCovid of Report
+    | GetStateCovid
+    | GotStateCovid of Report
+    | ChangeDropDown of string
     | ErrorMsg of exn
+
+
 
 let init () =
     {
@@ -41,17 +54,15 @@ let covidApi =
     |> Remoting.buildProxy<ICovidApi>
 
 let getResponse () = async{
-    let! usData = covidApi.getCurrentUSData ()
-    printf "********** %A *********" usData
+    let! usData = covidApi.getHistoricalUSData ()
     return
         {
             USData = usData
+            StateData = ""
+            SelectedItem = "US"
         }
 }
 
-open Fable.React
-open Fable.React.Props
-open Fulma
 
 let update msg model =
     match model, msg with
@@ -59,6 +70,9 @@ let update msg model =
         {model with ServerState = Loading}, Cmd.OfAsync.either getResponse () GotCurrentUSCovid ErrorMsg
     | _, GotCurrentUSCovid response ->
         { model with Report = Some response ; ServerState = Idle }, Cmd.none
+    | _, ChangeDropDown item ->
+        sprintf "%s" item |> ignore
+        {model with ServerState = Loading}, Cmd.OfAsync.either getResponse () GotCurrentUSCovid ErrorMsg
     | _, ErrorMsg e->
         { model with ServerState = ServerError e.Message }, Cmd.none
 
@@ -75,27 +89,101 @@ module ViewParts =
 
         ]
 
-//Start Helpers
-let nv = Nv.nv
-let d3 = D3.d3
+let margin t r b l =
+    Chart.Margin {top = t; bottom = b; right = r; left = l}
 
-type DataPoints = {
-    x : int
-    y : int
+let private onMouseEvent data evt = // should have sig (data, activeIndex, event)
+  JS.console.log("MOUSE:", data, evt)
+
+let private onMouseEventIndexed data index evt = // should have sig (data, activeIndex, event)
+  JS.console.log("MOUSE:", "Group " + string index, data, evt)
+
+let format (x: float)  =
+    printf "%A" x
+    moment.unix(x).format("MMM Do")
+
+let customizedAxisTick x y payload =
+    text [ X x ; Y y ;  ] [ payload ]
+
+let intersperse sep ls =
+    List.foldBack (fun x -> function
+        | [] -> [x]
+        | xs -> x::sep::xs) ls []
+
+let safeComponents =
+    let components =
+        [ "Saturn", "https://saturnframework.github.io/docs/"
+          "Fable", "http://fable.io"
+          "Elmish", "https://fable-elmish.github.io/"
+          "Fulma", "https://fulma.github.io/Fulma/" ]
+        |> List.map (fun (desc,link) -> a [ Href link ] [ str desc ] )
+        |> intersperse (str ", ")
+        |> span []
+
+    p [] [
+        strong [] [ a [ Href "https://safe-stack.github.io/" ] [ str "SAFE Template" ] ]
+        str " powered by: "
+        components
+    ]
+
+let basicTile title options content =
+        Tile.tile options [
+            Notification.notification [ Notification.Props [ Style [ Height "100%"; Width "100%" ] ] ] [
+                Heading.h2 [] [ str title ]
+                yield! content
+            ]
+        ]
+type Line = {
+    DataKey : string
+    Color : string
 }
 
-type Feed = {
-    values : DataPoints list
-    key : string
-    colors : string
-}
+let drawLine (lineToDraw : Line list) =
+    let xAxis =
+        [
+            xaxis
+          [ Cartesian.DataKey "unixDate"
+            Cartesian.Type "number"
+            Cartesian.Domain [| "auto" ; "auto" |]
+            Cartesian.TickFormatter (fun x-> format x)
+            //Cartesian.Interval 0
+            //Cartesian.Tick customizedAxisTick
+            Cartesian.Scale ScaleType.Time
+            ]
+          []
+        ]
+    let yAxis = [ yaxis [] [] ]
+    let tooltip =[ tooltip [] [] ]
+    let legend = [ legend [] [] ]
 
-type MM (l: float option, r: float option, t : float option, b : float option) =
-    interface Nv.Nv.Margin with
-        member val left = l with get, set
-        member val right = r with get, set
-        member val top = t with get, set
-        member val bottom = b with get, set
+    lineToDraw
+    |> List.map(fun y ->
+        line [ Cartesian.Type Monotone ; Cartesian.DataKey y.DataKey ; Cartesian.Dot false ; Cartesian.Stroke y.Color] []
+    )
+    |> List.append yAxis
+    |> List.append tooltip
+    |> List.append legend
+
+let drawChart (title : string) (lines : Line list) (chartData : USData array) =
+
+    basicTile title [ Tile.Size Tile.Is12 ] [
+        lineChart
+            [ margin 5. 40. 5. 40.
+              Chart.Width 1000.
+              Chart.Height 500.
+              Chart.Data chartData
+              Chart.OnClick onMouseEvent ]
+
+            (drawLine lines)
+        ]
+
+let populateDropDown items selectedItem (dispatch : Msg ->  unit) =
+    items |> List.map(fun item ->
+        if item = selectedItem then
+            Dropdown.Item.a [ Dropdown.Item.IsActive true ] [ str item ]
+        else Dropdown.Item.a [ Dropdown.Item.Props [ OnClick (fun _ -> dispatch (Msg.ChangeDropDown item))]] [ str item ]
+    )
+
 //End Helpers
 let view (model : Model) (dispatch : Msg -> unit) =
     section [] [
@@ -111,31 +199,41 @@ let view (model : Model) (dispatch : Msg -> unit) =
                 ]
             ]
         ]
-
         Container.container [] [
-            match model with
-            | { Report = None ; ServerState = Idle | Loading} -> ()
-            | {ServerState = ServerError error} ->
-                Field.div [][
-                    Tag.list [ Tag.List.HasAddons ; Tag.List.IsCentered ] [
-                        Tag.tag [ Tag.Color Color.IsDanger ; Tag.Size IsMedium ] [
-                            str error
+            Tile.ancestor [
+                Tile.Size Tile.Is12
+            ] [
+                match model with
+                | { Report = None ; ServerState = Idle | Loading } -> ()
+                | { ServerState = ServerError error} -> str error
+                | { Report = Some report } ->
+                        Tile.parent[ Tile.Size Tile.Is12 ] [
+                        let d = [ { Line.Color = "red" ; DataKey = "positive" } ; { Line.Color = "black" ; DataKey = "total" } ]
+                        drawChart "Positive Cases" d report.USData
                         ]
-                    ]
-                ]
-            | {Report = Some report} ->
-                //let chart = nv.charts
-                let chart = nv.model
-                str "test"
+                        Tile.parent [ ] [
+                            Tile.child [  ] [
+                                    Dropdown.dropdown [ Dropdown.IsHoverable ]
+                                        [ Dropdown.trigger [ ]
+                                            [ Button.button [ ]
+                                                [ span [ ]
+                                                    [ str "States" ]
+                                                  Icon.icon [ Icon.Size IsSmall ]
+                                                    [ Fa.i [ Fa.Solid.AngleDown ]
+                                                        [ ] ] ] ]
+                                          Dropdown.menu [ ]
+                                            [ Dropdown.content [  ] (populateDropDown DropDownItems report.SelectedItem dispatch) ]
+                                        ]
+                            ]
+                        ]
+                | _ -> str "test"
 
-            (*
-            | { Report = Some report } ->
-                Tile.ancestor[
-                    Tile.Size Tile.Is12
-                ] [
-                    Tile.parent [ Tile.Size Tile.Is12 ] [
-
-                    ]
-                ]*)
+            ]
+        ]
+        br []
+        Footer.footer [] [
+            Content.content [
+                Content.Modifiers [ Fulma.Modifier.TextAlignment(Screen.All, TextAlignment.Centered) ]
+            ] [ safeComponents ]
         ]
     ]

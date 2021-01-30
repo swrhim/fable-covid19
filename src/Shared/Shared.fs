@@ -7,9 +7,12 @@ module Route =
     let builder typeName methodName =
         sprintf "/api/%s/%s" typeName methodName
 
-type USData =
+type USDataFull =
     {
-        date : DateTime
+        date : int
+        dateTime : DateTime
+        month : int
+        unixDate : float
         death : int
         deathIncrease : int
         hospitalized : int
@@ -25,9 +28,24 @@ type USData =
         totalTestResults : int
         totalTestResultsIncreased : int
     }
+type USData =
+    {
+        date : int
+        dateTime : DateTime
+        month : int
+        unixDate : float
+        death : int
+        hospitalized : int
+        negative : int
+        pending : int
+        positive : int
+        total : int
+        recovered : int
+        totalTestResults : int
+    }
 
 type ICovidApi =
     {
-        getCurrentUSData : unit -> Async<USData>
+        getHistoricalUSData : unit -> Async<USData array>
         //getCurrentStateData : unit -> Async<StateData list>
     }
