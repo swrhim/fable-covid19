@@ -17,8 +17,7 @@ type ServerState = Idle | Loading | ServerError of string
 let DropDownItems = [ "US" ; "NJ" ; "NY" ]
 type Report =
     {
-        USData : USData array
-        StateData : string
+        USData : USData array option
         SelectedItem : string
     }
 
@@ -53,26 +52,23 @@ let covidApi =
     |> Remoting.withRouteBuilder Route.builder
     |> Remoting.buildProxy<ICovidApi>
 
-let getResponse () = async{
-    let! usData = covidApi.getHistoricalUSData ()
+let getResponse loc = async{
+    let! usData = covidApi.getHistoricalUSData loc
     return
         {
-            USData = usData
-            StateData = ""
-            SelectedItem = "US"
+            USData = Some usData
+            SelectedItem = loc
         }
 }
-
 
 let update msg model =
     match model, msg with
     | _, GetCurrentUSCovid ->
-        {model with ServerState = Loading}, Cmd.OfAsync.either getResponse () GotCurrentUSCovid ErrorMsg
+        {model with ServerState = Loading}, Cmd.OfAsync.either getResponse "US" GotCurrentUSCovid ErrorMsg
     | _, GotCurrentUSCovid response ->
         { model with Report = Some response ; ServerState = Idle }, Cmd.none
     | _, ChangeDropDown item ->
-        sprintf "%s" item |> ignore
-        {model with ServerState = Loading}, Cmd.OfAsync.either getResponse () GotCurrentUSCovid ErrorMsg
+        {model with ServerState = Loading}, Cmd.OfAsync.either getResponse item GotCurrentUSCovid ErrorMsg
     | _, ErrorMsg e->
         { model with ServerState = ServerError e.Message }, Cmd.none
 
@@ -209,7 +205,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                 | { Report = Some report } ->
                         Tile.parent[ Tile.Size Tile.Is12 ] [
                         let d = [ { Line.Color = "red" ; DataKey = "positive" } ; { Line.Color = "black" ; DataKey = "total" } ]
-                        drawChart "Positive Cases" d report.USData
+                        drawChart model.Title d (report.USData |> Option.get)
                         ]
                         Tile.parent [ ] [
                             Tile.child [  ] [

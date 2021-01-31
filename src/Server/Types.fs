@@ -9,7 +9,6 @@ open Core
 type USDataRaw =
     {
         date : int
-        dateChecked : string
         death : int option
         deathIncrease : int option
         hash : string
@@ -27,7 +26,6 @@ type USDataRaw =
         positive : int option
         positiveIncrease : int option
         recovered : int option
-        states : int option
         totalTestResults : int option
         totalTestResultsIncrease : int option
     }
@@ -37,11 +35,12 @@ type USDataRaw =
         static member serialize (x : USDataRaw) : string = FsCodec.NewtonsoftJson.Serdes.Serialize x
 
 type USData with
-    static member Create (x : USDataRaw) =
+    static member Create (x : USDataRaw) loc =
         let dt = DateTime.ParseExact(x.date.ToString(), "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None)
         let a =
             {
                 USData.date = x.date
+                loc = loc
                 unixDate = (float)(((DateTimeOffset)dt).ToUnixTimeSeconds())
                 dateTime = dt
                 month = dt.Month
@@ -55,3 +54,4 @@ type USData with
                 totalTestResults = x.totalTestResults |> Option.getValueOr 0
             }
         { a with total = a.pending + a.negative + a.positive }
+

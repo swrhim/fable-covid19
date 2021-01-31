@@ -12,11 +12,15 @@ open Shared
 open Types
 
 type CovidData () =
-    member __.GetHistoricalUSData() =
-        getHistoricalCovidData
-        |> Async.map(fun a ->
+    member __.GetHistoricalUSData loc =
+        let results =
+            if(loc = "US") then
+                getHistoricalCovidData
+            else
+                getHistoricalStateCovidData loc
+        results |> Async.map(fun a ->
             a
-            |> Array.map(fun c -> USData.Create c)
+            |> Array.map(fun c -> USData.Create c loc)
             |> Array.rev
             |> Array.groupBy(fun x -> x.month)
             |> Array.map(fun (_, v) ->
@@ -27,13 +31,11 @@ type CovidData () =
             )
         )
 
-
 let covidData =
         CovidData()
 let covidApi =
     {
-        getHistoricalUSData = fun () -> covidData.GetHistoricalUSData()
-        //getCurrentStateData = fun () -> async.Return ()
+        getHistoricalUSData = covidData.GetHistoricalUSData
     }
 
 let webApp =

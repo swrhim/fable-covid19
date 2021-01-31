@@ -31,6 +31,7 @@ type USDataFull =
 type USData =
     {
         date : int
+        loc : string
         dateTime : DateTime
         month : int
         unixDate : float
@@ -44,8 +45,24 @@ type USData =
         totalTestResults : int
     }
 
+ type StateData =
+     {
+         date : int
+         state : string
+         dateTime : DateTime
+         month : int
+         unixDate : float
+         death : int
+         hospitalized : int
+         negative : int
+         pending : int
+         positive : int
+         total : int
+         recovered : int
+         totalTestResults : int
+     }
+
 type ICovidApi =
     {
-        getHistoricalUSData : unit -> Async<USData array>
-        //getCurrentStateData : unit -> Async<StateData list>
+        getHistoricalUSData : string -> Async<USData array>
     }
