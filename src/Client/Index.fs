@@ -14,11 +14,11 @@ open Fable.Recharts.Props
 open Fulma
 
 type ServerState = Idle | Loading | ServerError of string
-let DropDownItems = [ "US" ; "NJ" ; "NY" ]
+let DropDownItems = [ US ; NJ; NY ]
 type Report =
     {
         USData : USData array option
-        SelectedItem : string
+        SelectedItem : Location
     }
 
 type Model =
@@ -34,7 +34,7 @@ type Msg =
     | GotCurrentUSCovid of Report
     | GetStateCovid
     | GotStateCovid of Report
-    | ChangeDropDown of string
+    | ChangeDropDown of Location
     | ErrorMsg of exn
 
 
@@ -64,7 +64,7 @@ let getResponse loc = async{
 let update msg model =
     match model, msg with
     | _, GetCurrentUSCovid ->
-        {model with ServerState = Loading}, Cmd.OfAsync.either getResponse "US" GotCurrentUSCovid ErrorMsg
+        {model with ServerState = Loading}, Cmd.OfAsync.either getResponse Location.US GotCurrentUSCovid ErrorMsg
     | _, GotCurrentUSCovid response ->
         { model with Report = Some response ; ServerState = Idle }, Cmd.none
     | _, ChangeDropDown item ->
@@ -72,6 +72,7 @@ let update msg model =
     | _, ErrorMsg e->
         { model with ServerState = ServerError e.Message }, Cmd.none
 
+//Begin View Functions
 module ViewParts =
     let basicTile title option content =
         Tile.tile option [
@@ -88,15 +89,17 @@ module ViewParts =
 let margin t r b l =
     Chart.Margin {top = t; bottom = b; right = r; left = l}
 
+//Debug functions for JS
 let private onMouseEvent data evt = // should have sig (data, activeIndex, event)
   JS.console.log("MOUSE:", data, evt)
 
 let private onMouseEventIndexed data index evt = // should have sig (data, activeIndex, event)
   JS.console.log("MOUSE:", "Group " + string index, data, evt)
+//End Debug functions for JS
 
 let format (x: float)  =
     printf "%A" x
-    moment.unix(x).format("MMM Do")
+    moment.unix(x).format("M/D/YY")
 
 let customizedAxisTick x y payload =
     text [ X x ; Y y ;  ] [ payload ]
@@ -142,20 +145,24 @@ let drawLine (lineToDraw : Line list) =
             Cartesian.Type "number"
             Cartesian.Domain [| "auto" ; "auto" |]
             Cartesian.TickFormatter (fun x-> format x)
-            //Cartesian.Interval 0
-            //Cartesian.Tick customizedAxisTick
             Cartesian.Scale ScaleType.Time
             ]
           []
         ]
     let yAxis = [ yaxis [] [] ]
-    let tooltip =[ tooltip [] [] ]
+    let tooltip =
+        [
+            tooltip
+                [
+                ] []
+        ]
     let legend = [ legend [] [] ]
 
     lineToDraw
     |> List.map(fun y ->
         line [ Cartesian.Type Monotone ; Cartesian.DataKey y.DataKey ; Cartesian.Dot false ; Cartesian.Stroke y.Color] []
     )
+    |> List.append xAxis
     |> List.append yAxis
     |> List.append tooltip
     |> List.append legend
@@ -166,7 +173,7 @@ let drawChart (title : string) (lines : Line list) (chartData : USData array) =
         lineChart
             [ margin 5. 40. 5. 40.
               Chart.Width 1000.
-              Chart.Height 500.
+              Chart.Height 600.
               Chart.Data chartData
               Chart.OnClick onMouseEvent ]
 
@@ -176,8 +183,8 @@ let drawChart (title : string) (lines : Line list) (chartData : USData array) =
 let populateDropDown items selectedItem (dispatch : Msg ->  unit) =
     items |> List.map(fun item ->
         if item = selectedItem then
-            Dropdown.Item.a [ Dropdown.Item.IsActive true ] [ str item ]
-        else Dropdown.Item.a [ Dropdown.Item.Props [ OnClick (fun _ -> dispatch (Msg.ChangeDropDown item))]] [ str item ]
+            Dropdown.Item.a [ Dropdown.Item.IsActive true ] [ str (Location.ToString item)]
+        else Dropdown.Item.a [ Dropdown.Item.Props [ OnClick (fun _ -> dispatch (Msg.ChangeDropDown item))]] [ str (Location.ToString item) ]
     )
 
 //End Helpers
@@ -222,8 +229,6 @@ let view (model : Model) (dispatch : Msg -> unit) =
                                         ]
                             ]
                         ]
-                | _ -> str "test"
-
             ]
         ]
         br []

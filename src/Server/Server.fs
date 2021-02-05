@@ -14,7 +14,7 @@ open Types
 type CovidData () =
     member __.GetHistoricalUSData loc =
         let results =
-            if(loc = "US") then
+            if(loc = Location.US) then
                 getHistoricalCovidData
             else
                 getHistoricalStateCovidData loc
@@ -22,13 +22,22 @@ type CovidData () =
             a
             |> Array.map(fun c -> USData.Create c loc)
             |> Array.rev
-            |> Array.groupBy(fun x -> x.month)
-            |> Array.map(fun (_, v) ->
-                 let r =
-                     v
-                     |> Array.sortBy(fun y -> y.date)
-                 Array.get r (v.Length-1)
-            )
+            //|> Array.groupBy(fun x -> x.groupingField)
+            (*|> Array.map(fun (k, v) ->
+                let r =
+                    v
+                    |> Array.sortBy(fun y -> y.date)
+                let sum = USData.SumUp(r)
+                //take last item and fill in some data for grouping purposes
+                let lastItem = v |> Array.last
+                { sum with
+                    date = lastItem.date
+                    loc = lastItem.loc
+                    unixDate = lastItem.unixDate
+                    month = lastItem.month
+                    groupingField = lastItem.groupingField
+                }
+            ) *)
         )
 
 let covidData =

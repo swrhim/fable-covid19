@@ -28,10 +28,31 @@ type USDataFull =
         totalTestResults : int
         totalTestResultsIncreased : int
     }
+
+type Location =
+    | US
+    | NJ
+    | NY
+    | MOON
+with
+    static member ToString loc =
+        match loc with
+        | US -> "US"
+        | NJ -> "NJ"
+        | NY -> "NY"
+        | MOON -> "MOON"
+
+    static member FromString loc =
+        match loc with
+        | "US" -> US
+        | "NJ" -> NJ
+        | "NY" -> NY
+        | _ -> MOON
+
 type USData =
     {
         date : int
-        loc : string
+        loc : Location
         dateTime : DateTime
         month : int
         unixDate : float
@@ -43,6 +64,7 @@ type USData =
         total : int
         recovered : int
         totalTestResults : int
+        groupingField : string
     }
 
  type StateData =
@@ -64,5 +86,5 @@ type USData =
 
 type ICovidApi =
     {
-        getHistoricalUSData : string -> Async<USData array>
+        getHistoricalUSData : Location -> Async<USData array>
     }

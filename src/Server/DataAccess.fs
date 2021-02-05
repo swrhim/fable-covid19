@@ -1,6 +1,7 @@
 module DataAccess
 
 open System.Net.Http
+open Shared
 
 [<AutoOpen>]
 module CovidDataApi =
@@ -16,10 +17,10 @@ module CovidDataApi =
     }
 
     let getHistoricalStateCovidData state = async{
-        let currentUrl = stateFormat baseUrl state "daily.json"
+        let stateString = Location.ToString state
+        let currentUrl = stateFormat baseUrl stateString"daily.json"
         let! response = client.GetAsync(currentUrl) |> Async.AwaitTask
         let x = response.Content.ReadAsStringAsync().Result
-        printf "GOING TO DESErIALIZE"
         let b = x |> USDataRaw.deserialize
         printf "YO I DID IT"
         return b
