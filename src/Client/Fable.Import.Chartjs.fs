@@ -45,7 +45,7 @@ type [<AllowNullLiteral>] Chart =
 
 type [<AllowNullLiteral>] ChartStatic =
     abstract Chart: obj
-    [<EmitConstructor>] abstract Create: context: U4<string, CanvasRenderingContext2D, HTMLCanvasElement, ArrayLike<U2<CanvasRenderingContext2D, HTMLCanvasElement>>> * options: Chart.ChartConfiguration -> Chart
+    [<EmitConstructor>] abstract Create: context: U4<string, CanvasRenderingContext2D, HTMLCanvasElement, Array<U2<CanvasRenderingContext2D, HTMLCanvasElement>>> * options: Chart.ChartConfiguration -> Chart
     abstract pluginService: PluginServiceStatic with get, set
     abstract plugins: PluginServiceStatic with get, set
     abstract defaults: ChartStaticDefaults with get, set
